@@ -109,9 +109,15 @@ class Stock
         const element = document.createElement("p");
         element.classList.add("userstock-element");
         this.sell = document.createElement("button");
+        this.sellAmount = document.createElement("button");
+        this.sellAll = document.createElement("button");
         this.sell.innerText = "Sell";
+        this.sellAmount.innerText = "Sell amount";
+        this.sellAll.innerText = "Sell all";
         element.innerHTML = `${this.name} | ${this.price} | ${this.number} | ${this.owning} | `;
         element.appendChild(this.sell);
+        element.appendChild(this.sellAmount);
+        element.appendChild(this.sellAll);
         return element;
     }
 }
@@ -129,6 +135,7 @@ class ServerException extends Error
 
 // Set methods (POST)
 
+// Buy stocks from the market
 async function buyStock(stock, amount = 1)
 {
     try
@@ -158,6 +165,38 @@ async function buyStock(stock, amount = 1)
     }catch (exception)
     {
         alert("Buying the stock failed: " + exception.message);
+    }
+}
+
+async function sellStock(stock, amount = 1)
+{
+    try
+    {
+        // Make a post request to the server
+        const response = await fetch(SERVER_BASE_URL + "/api/account/positions", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                stock: {
+                    name: stock.name
+                },
+                number: amount * -1
+            })
+        })
+
+        // Check response
+        if (!response.ok) {
+            if (response.status === 422) alert(`Cant buy sell ${stock.name}: ${(await response.json()).error}`);
+            else alert(`Could not sell stock ${stock.name}: ${response.statusText}`);
+        }
+
+        // Update all dynamic ui immediately to make sure all changes are visible
+        uiUpdateDynamic();
+    }catch (exception)
+    {
+        alert("Selling the stock failed: " + exception.message);
     }
 }
 
@@ -258,6 +297,20 @@ async function buildAccountList()
         env.innerHTML = "";                                     // TODO: Find a better way to update the list | low
         stocks.forEach((stock) => {
             env.appendChild(stock.htmlRepresentationUserList);
+
+            stock.sell.addEventListener('click', () => {
+                sellStock(stock);
+            })
+
+            stock.sellAmount.addEventListener('click', () => {
+                const amount = parseInt(prompt("Please enter desired selling amount"));
+                if(isNaN(amount)) {alert("Selling amount is invalid"); return;}
+                sellStock(stock, amount);
+            })
+
+            stock.sellAll.addEventListener('click', () => {
+                sellStock(stock, stock.owning);
+            })
         })
 
     }catch (exception)
