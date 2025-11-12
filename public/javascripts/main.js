@@ -83,6 +83,12 @@ class ServerPacket
     }
 }
 
+const UserOwnedStockTypes =
+{
+    stocks: new Map()
+}
+
+
 // Class representing a single stock
 class Stock
 {
@@ -116,7 +122,7 @@ class Stock
         this.sell.innerText = "Sell";
         this.sellAmount.innerText = "Sell amount";
         this.sellAll.innerText = "Sell all";
-        element.innerHTML = `${this.name} | ${this.price} | ${this.number} | ${this.owning} | `;
+        element.innerHTML = `${this.name} | ${this.price} | ${this.number} | ${this.owning} | ${UserOwnedStockTypes.stocks.has(this.name) ? this.price - UserOwnedStockTypes.stocks.get(this.name) : "N.a."} | `;
         element.appendChild(this.sell);
         element.appendChild(this.sellAmount);
         element.appendChild(this.sellAll);
@@ -181,6 +187,9 @@ async function buyStock(stock, amount = 1)
 
         // Update all dynamic ui immediately to make sure all changes are visible
         uiUpdateDynamic();
+
+        // Add the stock to the user owned stocks and update the price
+        UserOwnedStockTypes.stocks.set(stock.name, stock.price);
     }catch (exception)
     {
         alert("Buying the stock failed: " + exception.message);
@@ -209,10 +218,17 @@ async function sellStock(stock, amount = 1)
         if (!response.ok) {
             if (response.status === 422) alert(`Cant buy sell ${stock.name}: ${(await response.json()).error}`);
             else alert(`Could not sell stock ${stock.name}: ${response.statusText}`);
+            return;
         }
 
         // Update all dynamic ui immediately to make sure all changes are visible
         uiUpdateDynamic();
+
+        // Remove the stock from the user owned stocks if necessary
+        if (amount >= stock.owning)
+        {
+            UserOwnedStockTypes.stocks.delete(stock.name);
+        }
     }catch (exception)
     {
         alert("Selling the stock failed: " + exception.message);
@@ -366,7 +382,7 @@ async function buildFullMarketList()
     try
     {
         const stocks = await getAllStocks();
-        stocks.sort((a, b) => a.price - b.price);
+        stocks.sort((a, b) => b.price - a.price);
         Log.log(`Stockmarket is ${stocks}`);              // @Jenkins line-remove-on-publish
 
         // Get the stockmarket div
@@ -408,7 +424,7 @@ async function buildLeaderboard()
     try
     {
         const users = await getAllUsers();
-        users.sort((a, b) => a.balance - b.balance);
+        users.sort((a, b) => b.balance - a.balance);
         Log.log(`Leaderboard is ${users.length}`);              // @Jenkins line-remove-on-publish
 
         // Get the leaderboard div
@@ -483,6 +499,7 @@ async function uiUpdateDynamic()
 
         document.getElementById("test-plain-balance").innerText = user.balance;
         BALANCE = user.balance;
+        if (BALANCE_START === null) BALANCE_START = user.balance;
 
     }catch (exception)
     {
@@ -491,6 +508,10 @@ async function uiUpdateDynamic()
             alert("Failed to load balance form server: " + exception.userMessage);
         }
     }
+
+    // Update the return field
+    const r = BALANCE - BALANCE_START;
+    document.getElementById("test-plain-return").innerText = r;
 
     // Update the leaderboard
     buildLeaderboard();
