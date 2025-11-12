@@ -84,11 +84,12 @@ class ServerPacket
 // Class representing a single stock
 class Stock
 {
-    constructor(name, price, number)
+    constructor(name, price, number, owning = 0)
     {
         this.name = name;
         this.price = price;
         this.number = number;
+        this.owning = owning;
     }
     get htmlRepresentation()
     {
@@ -98,6 +99,16 @@ class Stock
         this.buy.innerText = "Buy";
         element.innerHTML = `${this.name} | ${this.price} | ${this.number} | `;
         element.appendChild(this.buy);
+        return element;
+    }
+    get htmlRepresentationUserList()
+    {
+        const element = document.createElement("p");
+        element.classList.add("userstock-element");
+        this.sell = document.createElement("button");
+        this.sell.innerText = "Sell";
+        element.innerHTML = `${this.name} | ${this.price} | ${this.number} | ${this.owning} | `;
+        element.appendChild(this.sell);
         return element;
     }
 }
@@ -146,6 +157,7 @@ async function getAllUsers()
     throw new ServerException("Unable to get user", packet.message);
 }
 
+// Get all available stocks on the market
 async function getAllStocks()
 {
     const packet = await getRequestToServe("/api/stocks");
@@ -153,20 +165,74 @@ async function getAllStocks()
     {
         //Build a list of all available stocks
         const stocks = [];
-        Log.log(`11111111111111111111111111111111111111111111111`);                  // @Jenkins line-remove-on-publish
         const json = await packet.payload.json();
         json.forEach(stock => stocks.push(new Stock(stock.name, stock.price, stock.numberAvailable)));
-        Log.log(`22222222222222222222222222222222222222222222222`);                  // @Jenkins line-remove-on-publish
         Log.log(`Available stock list is ${stocks}`);                  // @Jenkins line-remove-on-publish
-        Log.log(`33333333333333333333333333333333333333333333333`);                  // @Jenkins line-remove-on-publish
         return stocks;
     }
     Log.log(`Stock market fetch failed`);                  // @Jenkins line-remove-on-publish
     throw new ServerException("Unable to get stocks", packet.message);
 }
 
+// Get all available stocks owned by the user
+async function getUserStocks()
+{
+    const packet = await getRequestToServe("/api/account");
+    if(packet.ok)
+    {
+        //Build a list of all available stocks
+        const stocks = [];
+        const json = (await packet.payload.json()).positions;
+        json.forEach(stock => stocks.push(new Stock(stock.stock.name, stock.stock.price, stock.stock.numberAvailable, stock.number)));
+        Log.log(`Available stock list is ${stocks}`);                  // @Jenkins line-remove-on-publish
+        return stocks;
+    }
+    Log.log(`Account fetch failed`);                  // @Jenkins line-remove-on-publish
+    throw new ServerException("Unable to get account data", packet.message);
+}
+
 // ########### MAIN UI ###############
 
+// Shows all stocks owned by the user
+async function buildAccountList()
+{
+    try
+    {
+        let stocks = await getUserStocks();
+        stocks.sort((a, b) => b.owning - a.owning);
+
+        // Remove all stocks the user doesn't own
+        stocks = stocks.filter((stock) => stock.owning > 0);
+
+        Log.log(`User stocks are ${stocks}`);              // @Jenkins line-remove-on-publish
+
+
+        // Get the user stock list div
+        const env = document.getElementById("div-area-userstocks-environment");
+
+        // Check if the account is empty
+        if (stocks <= 0)
+        {
+            env.innerHTML = "You dont have any stocks in your account, yet...";
+            return;
+        }
+
+        // Remove all existing children
+        env.innerHTML = "";                                     // TODO: Find a better way to update the list | low
+        stocks.forEach((stock) => {
+            env.appendChild(stock.htmlRepresentationUserList);
+        })
+
+    }catch (exception)
+    {
+        if (exception instanceof ServerException)
+        {
+            alert("Failed to load stock market list form server: " + exception.userMessage);
+        }
+    }
+}
+
+// Shows all stocks in ón market and allows to buy them
 async function buildFullMarketList()
 {
     try
@@ -266,6 +332,9 @@ async function uiUpdateDynamic()
 
     // Update the market
     buildFullMarketList();
+
+    // Update user account data
+    buildAccountList()
 
 }
 
