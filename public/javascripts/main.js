@@ -2,7 +2,7 @@
 
 // GLOBAL
 
-const SERVER_BASE_URL = "https://ypdpbec5rmupizpk.myfritz.net/lab-web-a-1/:3333";        // Without trailing slash!
+const SERVER_BASE_URL = "https://ypdpbec5rmupizpk.myfritz.net/lab-web-a-1/";        // Without trailing slash!
 const LOGGING = {
     verbose: true,
     warn: true,
