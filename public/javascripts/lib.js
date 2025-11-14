@@ -2,8 +2,8 @@
 
 // GLOBAL
 
-//export const SERVER_BASE_URL = "http://localhost:3333";        // Without trailing slash!
-export const SERVER_BASE_URL = "https://ypdpbec5rmupizpk.myfritz.net/lab-web-a-1";        // Without trailing slash!
+export const SERVER_BASE_URL = "./";        // Without trailing slash!
+//export const SERVER_BASE_URL = "https://ypdpbec5rmupizpk.myfritz.net/lab-web-a-1";        // Without trailing slash!
 export const LOGGING = {
     verbose: true,
     warn: true,
