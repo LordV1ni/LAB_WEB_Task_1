@@ -6,12 +6,15 @@
     <title>Depot – Börsenclient</title>
     <link rel="stylesheet" href="stylesheets/styles.css" />
     <script src="javascripts/navigation.js" defer></script>
+    <script type="module" src="javascripts/portfolio.js" async></script>
 </head>
 <body class="page-grid">
 
 <!-- Desktop Header mit Burger Menü -->
 <header id="topbar" aria-label="Hauptnavigation">
     <div class="logo-area">Depot</div>
+    <p id="display_name">Lade...</p>
+    <p id="display_balance">Lade...</p>
     <button id="burger-menu" class="burger" aria-label="Navigation umschalten">&#9776;</button>
     <nav id="desktop-nav" class="hidden">
         <ul>
@@ -28,7 +31,7 @@
     <!-- Portfolio Liste -->
     <section class="card">
         <h2>Mein Depot</h2>
-        <div id="portfolio-list">
+        <div id="div-environment-dynamic-portfolio-list">
             <!-- dynamischer Inhalt später via JS/API -->
             <p>Noch keine Aktien gekauft.</p>
         </div>
@@ -39,17 +42,19 @@
         <h2>Kaufen / Verkaufen</h2>
         <div class="form-group">
             <label>Aktien-Symbol</label>
-            <input type="text" id="trade-symbol" placeholder="z. B. AAPL" />
+            <select id="buy-stock-selection-drop-down" class="buy-stock-selection-drop-down">
+                <option value="none">Wird geladen...</option>
+            </select>
         </div>
 
         <div class="form-group">
             <label>Menge</label>
-            <input type="number" id="trade-amount" min="1" />
+            <input type="number" id="buy-stock-selection-amount" min="1" />
         </div>
 
         <div class="button-row">
-            <button id="btn-buy">Kaufen</button>
-            <button id="btn-sell">Verkaufen</button>
+            <button id="buy-stock-action__button__buy">Kaufen</button>
+            <button id="buy-stock-action__button__sell">Verkaufen</button>
         </div>
 
         <div id="trade-error" class="error-message"></div>
@@ -79,6 +84,20 @@
         <span>Nachrichten</span>
     </a>
 </nav>
+
+<!-- Templates -->
+
+<template id="div-environment-dynamic-portfolio-list__element-row-template">
+    <div class="div-environment-dynamic-portfolio-list:element-row-template">
+        <hr>
+        <button class="div-environment-dynamic-portfolio-list__element-row-template__action__quick-sell">Quick sell</button>
+        <span class="div-environment-dynamic-portfolio-list__element-row-template__name"></span>
+        <span class="div-environment-dynamic-portfolio-list__element-row-template__price"></span>
+        <span class="div-environment-dynamic-portfolio-list__element-row-template__owning"></span>
+        <span class="div-environment-dynamic-portfolio-list__element-row-template__profit"></span>
+        <hr>
+    </div>
+</template>
 
 </body>
 </html>

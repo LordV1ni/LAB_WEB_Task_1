@@ -16,6 +16,30 @@ export let BALANCE_START = null;
 export let BALANCE = 0;
 export let USERNAME = "";
 
+// Global UI
+
+// Initialize the data of the top navigation bar
+export async function initNavigationBar()
+{
+    const display_name = document.getElementById("display_name");
+    const display_balance = document.getElementById("display_balance");
+
+    // Get the user data
+    const user = await getUser();
+    display_name.textContent = user.name;
+    display_balance.textContent = user.balance;
+}
+
+// Update the data of the top navigation bar
+export async function updateNavigationBar()
+{
+    const display_balance = document.getElementById("display_balance");
+
+    // Get the user data
+    const user = await getUser();
+    display_balance.textContent = user.balance;
+}
+
 // Util
 
 // @Jenkins start-block-remove-on-publish
@@ -197,7 +221,7 @@ export async function buyStock(stock, amount = 1)
             },
             body: JSON.stringify({
                 stock: {
-                    name: stock.name
+                    name: stock
                 },
                 number: amount
             })
@@ -205,15 +229,16 @@ export async function buyStock(stock, amount = 1)
 
         // Check response
         if (!response.ok) {
-            if (response.status === 422) alert(`Cant buy stock ${stock.name}: ${(await response.json()).error}`);
-            else alert(`Could not buy stock ${stock.name}: ${response.statusText}`);
+            if (response.status === 422) alert(`Cant buy stock "${stock}": ${(await response.json()).error}`);
+            else alert(`Could not buy stock ${stock}: ${response.statusText}`);
         }
 
         // Update all dynamic ui immediately to make sure all changes are visible
         uiUpdateDynamic();
 
+        const json = await response.json();
         // Add the stock to the user owned stocks and update the price
-        UserOwnedStockTypes.stocks.set(stock.name, stock.price);
+        UserOwnedStockTypes.stocks.set(stock, json.sales.stock.price);
     }catch (exception)
     {
         alert("Buying the stock failed: " + exception.message);
@@ -232,7 +257,7 @@ export async function sellStock(stock, amount = 1)
             },
             body: JSON.stringify({
                 stock: {
-                    name: stock.name
+                    name: stock
                 },
                 number: amount * -1
             })
@@ -240,19 +265,11 @@ export async function sellStock(stock, amount = 1)
 
         // Check response
         if (!response.ok) {
-            if (response.status === 422) alert(`Cant buy sell ${stock.name}: ${(await response.json()).error}`);
-            else alert(`Could not sell stock ${stock.name}: ${response.statusText}`);
+            if (response.status === 422) alert(`Cant buy sell ${stock}: ${(await response.json()).error}`);
+            else alert(`Could not sell stock ${stock}: ${response.statusText}`);
             return;
         }
 
-        // Update all dynamic ui immediately to make sure all changes are visible
-        uiUpdateDynamic();
-
-        // Remove the stock from the user owned stocks if necessary
-        if (amount >= stock.owning)
-        {
-            UserOwnedStockTypes.stocks.delete(stock.name);
-        }
     }catch (exception)
     {
         alert("Selling the stock failed: " + exception.message);
@@ -373,10 +390,12 @@ export async function getUserStocks()
     if(packet.ok)
     {
         //Build a list of all available stocks
-        const stocks = [];
+        let stocks = [];
         const json = (await packet.payload.json()).positions;
         json.forEach(stock => stocks.push(new Stock(stock.stock.name, stock.stock.price, stock.stock.numberAvailable, stock.number)));
         Log.log(`Available stock list is ${stocks}`);                  // @Jenkins line-remove-on-publish
+        stocks.sort((a, b) => a.owning - b.owning);
+        stocks = stocks.filter((stock) => stock.owning > 0);        // Filter stocks the user dosent own
         return stocks;
     }
     Log.log(`Account fetch failed`);                  // @Jenkins line-remove-on-publish
