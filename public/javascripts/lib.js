@@ -56,7 +56,7 @@ async function getRequestToServe(endpoint)
 
 // Classes
 
-class User
+export class User
 {
     constructor(name, balance)
     {
@@ -73,7 +73,7 @@ class User
 }
 
 // Container for a response form the server
-class ServerPacket
+export class ServerPacket
 {
     constructor(status, message, payload)
     {
@@ -86,14 +86,14 @@ class ServerPacket
     }
 }
 
-const UserOwnedStockTypes =
+export const UserOwnedStockTypes =
 {
     stocks: new Map()
 }
 
 
 // Class representing a single stock
-class Stock
+export class Stock
 {
     constructor(name, price, number, owning = 0)
     {
@@ -133,9 +133,9 @@ class Stock
     }
 }
 
-const GLOBAL_STOCK_TRENDS = new Map();
+export const GLOBAL_STOCK_TRENDS = new Map();
 
-class News
+export class News
 {
     constructor(timestamp, time, text)
     {
@@ -152,7 +152,7 @@ class News
     }
 }
 
-class Message
+export class Message
 {
     constructor(date, sender, recipient, text)
     {
@@ -171,7 +171,7 @@ class Message
 }
 
 // Error during server communication
-class ServerException extends Error
+export class ServerException extends Error
 {
     constructor(message, userMessage)
     {
@@ -184,7 +184,7 @@ class ServerException extends Error
 // Set methods (POST)
 
 // Buy stocks from the market
-async function buyStock(stock, amount = 1)
+export async function buyStock(stock, amount = 1)
 {
     try
     {
@@ -219,7 +219,7 @@ async function buyStock(stock, amount = 1)
     }
 }
 
-async function sellStock(stock, amount = 1)
+export async function sellStock(stock, amount = 1)
 {
     try
     {
@@ -259,7 +259,7 @@ async function sellStock(stock, amount = 1)
 }
 
 // Send a message to one or more players
-async function sendMessage()
+export async function sendMessage()
 {
     // Get the recipient ad message
     const recipient = document.getElementById("input-text-plain-recipient").value;
@@ -318,7 +318,7 @@ async function sendMessage()
 // Get methods
 
 // Get the current user as a object of type user
-async function getUser()
+export async function getUser()
 {
     // Get the user data from the server
     const packet = await getRequestToServe("/api/user");
@@ -332,7 +332,7 @@ async function getUser()
 }
 
 // Get all users as a list of user objects
-async function getAllUsers()
+export async function getAllUsers()
 {
     // Get the user data from the server
     const packet = await getRequestToServe("/api/user/everybody");
@@ -349,7 +349,7 @@ async function getAllUsers()
 }
 
 // Get all available stocks on the market
-async function getAllStocks()
+export async function getAllStocks()
 {
     const packet = await getRequestToServe("/api/stocks");
     if(packet.ok)
@@ -366,7 +366,7 @@ async function getAllStocks()
 }
 
 // Get all available stocks owned by the user
-async function getUserStocks()
+export async function getUserStocks()
 {
     const packet = await getRequestToServe("/api/account");
     if(packet.ok)
@@ -383,7 +383,7 @@ async function getUserStocks()
 }
 
 // Get the last n news messages
-async function getNews(n)
+export async function getNews(n)
 {
     const packet = await getRequestToServe("/api/news?lastTime=0000000000000");
     if(packet.ok)
@@ -402,7 +402,7 @@ async function getNews(n)
 }
 
 // Get the last n messages
-async function getMessages(n)
+export async function getMessages(n)
 {
     const packet = await getRequestToServe("/api/messages?lastTime=0000000000000");
     if(packet.ok)
@@ -422,7 +422,7 @@ async function getMessages(n)
 
 // ########### MAIN UI ###############
 
-async function drawLineGraph()
+export async function drawLineGraph()
 {
     const canvas = document.getElementById('lineGraph');
     const ctx = canvas.getContext('2d');
@@ -493,7 +493,7 @@ async function drawLineGraph()
 }
 
 // Shows all stocks owned by the user
-async function buildAccountList()
+export async function buildAccountList()
 {
     try
     {
@@ -546,7 +546,7 @@ async function buildAccountList()
 }
 
 // Shows all stocks in ón market and allows to buy them
-async function buildFullMarketList()
+export async function buildFullMarketList()
 {
     try
     {
@@ -600,7 +600,7 @@ async function buildFullMarketList()
 }
 
 // Create the current leaderboard
-async function buildLeaderboard()
+export async function buildLeaderboard()
 {
     try
     {
@@ -624,7 +624,7 @@ async function buildLeaderboard()
 }
 
 // Create the news feed
-async function buildNews()
+export async function buildNews()
 {
     try
     {
@@ -648,7 +648,7 @@ async function buildNews()
 }
 
 // Create the message feed
-async function buildMessages()
+export async function buildMessages()
 {
     try
     {
@@ -684,7 +684,7 @@ async function buildMessages()
 
 // Update the static fields in the main ui
 // static == fields that are not expected to change at a regular interval
-async function uiUpdateStatic()
+export async function uiUpdateStatic()
 {
     // Update the username
     try
@@ -706,7 +706,7 @@ async function uiUpdateStatic()
 
 // Update the dynamic fields in the main ui
 // dynamic == fields that are expected to change at a regular interval
-async function uiUpdateDynamic()
+export async function uiUpdateDynamic()
 {
     // Update the balance
     try
@@ -749,14 +749,14 @@ async function uiUpdateDynamic()
 
 }
 
-async function initButtons()
+export async function initButtons()
 {
     document.getElementById("button-message-send").addEventListener("click", () => {
         sendMessage();
     })
 }
 
-async function init()
+export async function init()
 {
     // Init all buttons
     initButtons();
