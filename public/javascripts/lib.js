@@ -229,8 +229,14 @@ export async function buyStock(stock, amount = 1)
 
         // Check response
         if (!response.ok) {
-            if (response.status === 422) alert(`Cant buy stock "${stock}": ${(await response.json()).error}`);
-            else alert(`Could not buy stock ${stock}: ${response.statusText}`);
+            if (response.status === 422) {
+                alert(`Cant buy stock "${stock}": ${(await response.json()).error}`);
+                return;
+            }
+            else {
+                alert(`Could not buy stock ${stock}: ${response.statusText}`);
+                return;
+            }
         }
 
         // Update all dynamic ui immediately to make sure all changes are visible
@@ -265,9 +271,14 @@ export async function sellStock(stock, amount = 1)
 
         // Check response
         if (!response.ok) {
-            if (response.status === 422) alert(`Cant buy sell ${stock}: ${(await response.json()).error}`);
-            else alert(`Could not sell stock ${stock}: ${response.statusText}`);
-            return;
+            if (response.status === 422) {
+                alert(`Cant buy stock "${stock}": ${(await response.json()).error}`);
+                return;
+            }
+            else {
+                alert(`Could not buy stock ${stock}: ${response.statusText}`);
+                return;
+            }
         }
 
     }catch (exception)
