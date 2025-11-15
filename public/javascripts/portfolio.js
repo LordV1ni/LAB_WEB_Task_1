@@ -20,7 +20,7 @@ async function updateUserOwnedStocks()
 
     if (stocks.length <= 0)
     {
-        env.innerHTML = "<p class='div-environment-dynamic-portfolio-list_message'>Noch keine Aktien gekauft.</p>";
+        env.innerHTML = "<p class='portfolio-empty-message'>Noch keine Aktien gekauft.</p>";
         return;
     }
 
@@ -36,12 +36,40 @@ async function updateUserOwnedStocks()
         // Instance a new row template
         const clone = template.content.cloneNode(true);
 
-        clone.querySelector(".div-environment-dynamic-portfolio-list__element-row-template__name").textContent = stock.name;
-        clone.querySelector(".div-environment-dynamic-portfolio-list__element-row-template__price").textContent = stock.price;
-        clone.querySelector(".div-environment-dynamic-portfolio-list__element-row-template__owning").textContent = stock.owning;
-        const profit = (stock.price - UserOwnedStockTypes.stocks.get(stock.name));
-        clone.querySelector(".div-environment-dynamic-portfolio-list__element-row-template__profit").textContent = isNaN(profit) ? "unbekannt" : profit;
-        clone.querySelector(".div-environment-dynamic-portfolio-list__element-row-template__action__quick-sell").addEventListener("click", () => {
+        const rowElement = clone.querySelector(".portfolio-row");
+        const purchasePrice = UserOwnedStockTypes.stocks.get(stock.name);
+        const profit = purchasePrice ? (stock.price - purchasePrice) : null;
+        const profitPerShare = profit !== null ? profit : null;
+        const totalProfit = profitPerShare !== null ? (profitPerShare * stock.owning) : null;
+
+        // Set content
+        clone.querySelector(".portfolio-row__name").textContent = stock.name;
+        clone.querySelector(".portfolio-row__price").textContent = parseFloat(stock.price).toFixed(2) + " €";
+        clone.querySelector(".portfolio-row__owning").textContent = stock.owning;
+        
+        // Format profit display
+        const profitElement = clone.querySelector(".portfolio-row__profit");
+        if (profitPerShare !== null && !isNaN(profitPerShare)) {
+            const profitText = profitPerShare >= 0 ? `+${profitPerShare.toFixed(2)}` : profitPerShare.toFixed(2);
+            profitElement.textContent = `${profitText} € (${totalProfit >= 0 ? '+' : ''}${totalProfit.toFixed(2)} € gesamt)`;
+        } else {
+            profitElement.textContent = "unbekannt";
+        }
+
+        // Remove old color classes first
+        rowElement.classList.remove("portfolio-row--profit", "portfolio-row--loss");
+        
+        // Add color class based on profit
+        if (profitPerShare !== null && !isNaN(profitPerShare)) {
+            if (profitPerShare > 0) {
+                rowElement.classList.add("portfolio-row--profit");
+            } else if (profitPerShare < 0) {
+                rowElement.classList.add("portfolio-row--loss");
+            }
+        }
+
+        // Quick sell button
+        clone.querySelector(".portfolio-row__quick-sell").addEventListener("click", () => {
             placeOwnValuesInSellField(stock);
         });
 
@@ -144,7 +172,12 @@ async function placeOwnValuesInSellField(stock)
 
 async function init ()
 {
+    // Load purchase prices from localStorage
+    UserOwnedStockTypes.loadFromStorage();
+    
     initNavigationBar();
+    // Run contentLoop immediately to load data on page load
+    await contentLoop();
     startContentLoop();
     registerElementListeners()
 
@@ -155,6 +188,8 @@ async function contentLoop()
     updateNavigationBar();
     updateUserOwnedStocks();
     updateStockSelectionDropdownList();
+    await updateUserOwnedStocks();
+    await updateUserOwnedStocks();
 }
 
 async function startContentLoop()

@@ -15,6 +15,18 @@
     --border: #d8e1eb;               /* Standardrahmenfarbe */
     --radius: 12px;                  /* Standard-Eckenradius für Elemente */
     --shadow: rgba(0, 0, 0, 0.1);    /* Leichter Schattenton */
+    
+    /* Chart-Höhe: Hier kann die Anzeigegröße des Charts angepasst werden */
+    --chart-height: 400px;           /* Höhe des Chart-Containers */
+    
+    /* Card-Größen: Hier können die Höhen der Cards angepasst werden */
+    --chart-header-height: 60px;     /* Höhe des Headers (h2) */
+    --chart-form-height: 100px;       /* Höhe der Form-Group (Select) */
+    --chart-margins: 32px;           /* Gesamte Margins/Abstände */
+    
+    /* Card-Länge (Höhe): Hier kann die Gesamthöhe der Cards angepasst werden */
+    /* Erhöhe diesen Wert für mehr Platz nach unten (z.B. 600px, 700px, etc.) */
+    --chart-card-total-height: 765px; /* Berechnet: header + form + chart + margins */
 }
 
 /* ------------------------------------------------------------
@@ -138,6 +150,10 @@ textarea { resize: vertical; }
     z-index: 10; /* bleibt beim Scrollen oben sichtbar */
 }
 
+#topbar > *:first-child {
+    margin-right: auto;
+}
+
 .burger {
     font-size: 24px;
     background: none;
@@ -165,6 +181,28 @@ textarea { resize: vertical; }
     color: white;
 }
 
+/* Benutzerinformationen im Header */
+#user-info {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.user-label,
+.balance-label {
+    background-color: var(--primary);
+    color: white;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-weight: 500;
+}
+
+.user-name,
+.balance-value {
+    color: var(--text);
+    margin-left: 4px;
+}
+
 /* ------------------------------------------------------------
    ALLGEMEINE SEITENSTRUKTUR
    Grundraster für den Hauptbereich der Seite.
@@ -172,8 +210,10 @@ textarea { resize: vertical; }
 #layout {
     display: grid;
     grid-template-columns: 1fr 1fr; /* zwei Spalten nebeneinander */
+    grid-auto-rows: 1fr; /* Gleiche Höhe für alle Zeilen */
     gap: 20px;
     padding: 20px;
+    align-items: stretch; /* Cards haben gleiche Höhe */
 }
 
 /* Standardkarte mit Schatten und abgerundeten Ecken */
@@ -206,8 +246,20 @@ textarea { resize: vertical; }
     overflow: hidden;    /* verhindert, dass das Bild über den Rand hinausragt */
 }
 
+/* ------------------------------------------------------------
+   RANGLISTEN-KARTE
+   Ähnlich wie Dashboard-Card mit Fuchs-Logo im Hintergrund.
+------------------------------------------------------------ */
+.leaderboard-card {
+    grid-column: 1 / -1; /* Die Karte nimmt über beide Spalten des Hauptlayouts Platz ein */
+    min-height: 300px;
+    position: relative;  /* notwendig, damit ::before und ::after sich auf diese Karte beziehen */
+    overflow: hidden;    /* verhindert, dass das Bild über den Rand hinausragt */
+}
+
 /* Logo-Grafik im rechten Drittel als dezentes Hintergrundelement */
-.dashboard-card::before {
+.dashboard-card::before,
+.leaderboard-card::before {
     content: '';
     position: absolute;
     top: 0;
@@ -223,7 +275,8 @@ textarea { resize: vertical; }
 }
 
 /* Halbtransparente weiße Fläche über dem Hintergrundbild (optional) */
-.dashboard-card::after {
+.dashboard-card::after,
+.leaderboard-card::after {
     content: '';
     position: absolute;
     top: 0; left: 0; right: 0; bottom: 0;
@@ -233,7 +286,8 @@ textarea { resize: vertical; }
 }
 
 /* Inhalt liegt über dem Bild und der weißen Schicht */
-.dashboard-card > * {
+.dashboard-card > *,
+.leaderboard-card > * {
     position: relative;
     z-index: 2;
 }
@@ -266,10 +320,6 @@ textarea { resize: vertical; }
     cursor: pointer;
 }
 
-.nav-card:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-}
 
 .nav-card-icon {
     color: var(--primary);
@@ -294,8 +344,22 @@ textarea { resize: vertical; }
 /* ------------------------------------------------------------
    FORMULARHILFEN UND TABELLEN
 ------------------------------------------------------------ */
-.form-group { margin-bottom: 10px; }
-.button-row { display: flex; gap: 10px; margin-top: 8px; }
+.form-group { 
+    margin-bottom: 16px; 
+}
+
+.form-label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 500;
+    color: var(--text);
+}
+
+.button-row { 
+    display: flex; 
+    gap: 10px; 
+    margin-top: 16px; 
+}
 
 table {
     width: 100%;
@@ -306,6 +370,41 @@ table th, table td {
     padding: 10px;
     text-align: left;
     border-bottom: 1px solid var(--border);
+}
+
+/* Ranglisten-Tabelle Styling */
+.ranking-table {
+    margin-top: 20px;
+    width: 100%;
+}
+
+.ranking-table thead {
+    background-color: rgba(255, 98, 0, 0.1);
+}
+
+.ranking-table th {
+    padding: 12px;
+    font-weight: 600;
+    color: var(--text);
+    text-align: left;
+    border-bottom: 2px solid var(--primary);
+}
+
+.ranking-table tbody tr {
+    transition: background-color 0.2s;
+}
+
+.ranking-table tbody tr:hover {
+    background-color: rgba(255, 98, 0, 0.05);
+}
+
+.ranking-table td {
+    padding: 12px;
+    color: var(--text);
+}
+
+.ranking-table tbody tr:last-child td {
+    border-bottom: none;
 }
 
 /* ------------------------------------------------------------
@@ -333,11 +432,6 @@ table th, table td {
     transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
-/* Hover-Effekt für diese Karten */
-.dashboard-card .nav-card:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 4px 10px rgba(0,0,0,0.15);
-}
 
 .dashboard-card .nav-card-icon {
     margin-bottom: 1rem;
@@ -408,8 +502,232 @@ table th, table td {
     }
 }
 
-.messages__div-recipient-list__clickable-element__select-deselect-user__template__active {
+/* Nachrichten-Seite: Empfänger-Checkboxes */
+.messages__recipient-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-top: 8px;
+    /* Max-Höhe für 6 Checkboxes: (Checkbox 20px + Padding 16px) * 6 + 5 Gaps * 8px = 256px */
+    max-height: calc(6 * (20px + 16px) + 5 * 8px);
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding-right: 4px;
+}
+
+/* Scrollbar Styling für Empfängerliste */
+.messages__recipient-list::-webkit-scrollbar {
+    width: 8px;
+}
+
+.messages__recipient-list::-webkit-scrollbar-track {
+    background: var(--bg);
+    border-radius: 4px;
+}
+
+.messages__recipient-list::-webkit-scrollbar-thumb {
+    background: var(--border);
+    border-radius: 4px;
+}
+
+.messages__recipient-list::-webkit-scrollbar-thumb:hover {
+    background: var(--text-light);
+}
+
+.messages__recipient-checkbox-label {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    padding: 8px;
+    border-radius: var(--radius);
+    transition: background-color 0.2s;
+}
+
+.messages__recipient-checkbox-label:hover {
+    background-color: rgba(255, 98, 0, 0.1);
+}
+
+.messages__recipient-checkbox {
+    appearance: none;
+    width: 20px;
+    height: 20px;
+    border: 2px solid var(--border);
+    border-radius: 4px;
+    margin-right: 10px;
+    position: relative;
+    cursor: pointer;
+    transition: all 0.2s;
+    flex-shrink: 0;
+}
+
+.messages__recipient-checkbox:checked {
     background-color: var(--primary);
+    border-color: var(--primary);
+}
+
+.messages__recipient-checkbox:checked::after {
+    content: '';
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%) rotate(45deg);
+    width: 5px;
+    height: 10px;
+    border: solid #003366;
+    border-width: 0 2px 2px 0;
+}
+
+.messages__recipient-checkbox-text {
+    color: var(--text);
+    font-size: 1rem;
+}
+
+/* Nachrichten-Formular Styling */
+.messages-new-message {
+    display: flex;
+    flex-direction: column;
+}
+
+.messages-new-message textarea {
+    width: 100%;
+    min-height: 120px;
+    padding: 12px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    font-size: 1rem;
+    font-family: inherit;
+    resize: vertical;
+}
+
+.messages-new-message textarea:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(255, 98, 0, 0.1);
+}
+
+/* ------------------------------------------------------------
+   DEPOT / PORTFOLIO STYLING
+------------------------------------------------------------ */
+
+.portfolio-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-top: 16px;
+}
+
+.portfolio-empty-message {
+    text-align: center;
+    color: var(--text-light);
+    padding: 32px;
+    font-style: italic;
+}
+
+.portfolio-row {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 16px;
+    transition: all 0.2s;
+}
+
+
+.portfolio-row--profit {
+    background: linear-gradient(to right, rgba(99, 255, 99, 0.1) 0%, var(--card-bg) 5%);
+    border-left: 4px solid #63ff63;
+}
+
+.portfolio-row--loss {
+    background: linear-gradient(to right, rgba(255, 67, 67, 0.1) 0%, var(--card-bg) 5%);
+    border-left: 4px solid #ff4343;
+}
+
+.portfolio-row__info {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.portfolio-row__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+}
+
+.portfolio-row__name {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--text);
+}
+
+.portfolio-row__quick-sell {
+    background: var(--primary);
+    color: white;
+    border: none;
+    padding: 6px 12px;
+    border-radius: var(--radius);
+    cursor: pointer;
+    font-size: 0.9rem;
+    transition: background 0.2s;
+}
+
+.portfolio-row__quick-sell:hover {
+    background: var(--primary-hover);
+}
+
+.portfolio-row__details {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 12px;
+}
+
+.portfolio-row__detail {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.portfolio-row__label {
+    font-size: 0.85rem;
+    color: var(--text-light);
+    font-weight: 500;
+}
+
+.portfolio-row__price,
+.portfolio-row__owning,
+.portfolio-row__profit {
+    font-size: 1rem;
+    color: var(--text);
+    font-weight: 500;
+}
+
+.portfolio-row--profit .portfolio-row__profit {
+    color: #006600;
+    font-weight: 600;
+}
+
+.portfolio-row--loss .portfolio-row__profit {
+    color: #cc0000;
+    font-weight: 600;
+}
+
+/* Trade Section Styling */
+.portfolio-trade-section select,
+.portfolio-trade-section input[type="number"] {
+    width: 100%;
+    padding: 10px;
+    border-radius: var(--radius);
+    border: 1px solid var(--border);
+    font-size: 1rem;
+    font-family: inherit;
+}
+
+.portfolio-trade-section select:focus,
+.portfolio-trade-section input[type="number"]:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(255, 98, 0, 0.1);
 }
 
 .messages__div-area-list__container__row-template__style-send-self {
@@ -422,10 +740,172 @@ table th, table td {
     text-align: left;
 }
 
+/* ------------------------------------------------------------
+   KURSE / CHART STYLING
+------------------------------------------------------------ */
+.chart-section {
+    display: flex;
+    flex-direction: column;
+    overflow: hidden; /* Verhindert Scrollen in der Chart-Section */
+    /* Höhe: Header + Form-Group + Chart-Höhe + Abstände */
+    /* ANPASSBAR: Ändere --chart-card-total-height in :root (Zeile 28) für mehr/weniger Höhe */
+    height: var(--chart-card-total-height);
+}
+
+.chart-wrapper {
+    display: flex;
+    gap: 8px;
+    margin-top: 16px;
+    height: var(--chart-height); /* Chart-Höhe: Änderbar über --chart-height Variable */
+    overflow: hidden; /* Verhindert Scrollen im Chart-Wrapper */
+    flex-shrink: 0; /* Verhindert, dass der Chart schrumpft */
+}
+
+.chart-y-axis {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    min-width: 70px; /* Etwas breiter für bessere Lesbarkeit */
+    padding-left: 8px;
+    padding-top: 10px; /* Padding oben, damit erste Zahl nicht abgeschnitten wird */
+    padding-bottom: 10px; /* Padding unten, damit letzte Zahl nicht abgeschnitten wird */
+    font-size: 0.85rem;
+    color: var(--text-light);
+    text-align: left;
+    order: 2; /* Position on the right side */
+}
+
+.chart-y-axis__tick {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    height: 1px;
+    position: relative;
+}
+
+.chart-y-axis__tick::after {
+    content: '';
+    position: absolute;
+    left: -8px;
+    width: 4px;
+    height: 1px;
+    background-color: var(--border);
+}
+
+.chart-container-wrapper {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    order: 1; /* Position on the left side */
+}
+
+.chart-container {
+    flex: 1;
+    position: relative;
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+    min-height: 0; /* Wichtig für Flexbox */
+}
+
 .chart__display__line-graph-canvas {
     width: 100%;
     height: 100%;
-    outline: 1px solid black;
+    display: block;
+}
+
+.chart-x-axis {
+    display: flex;
+    justify-content: space-between;
+    padding-top: 8px;
+    font-size: 0.85rem;
+    color: var(--text-light);
+    min-height: 30px;
+    margin-left: 0; /* Beginnt bei der Chart-Darstellung, nicht bei der Y-Achse */
+    width: 100%; /* Nimmt die volle Breite des Container-Wrappers ein */
+}
+
+.chart-x-axis__tick {
+    flex: 1;
+    text-align: center;
+    position: relative;
+}
+
+.chart-x-axis__tick::before {
+    content: '';
+    position: absolute;
+    top: -8px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 1px;
+    height: 4px;
+    background-color: var(--border);
+}
+
+.chart-select {
+    width: 100%;
+    padding: 10px;
+    border-radius: var(--radius);
+    border: 1px solid var(--border);
+    font-size: 1rem;
+    font-family: inherit;
+    background: var(--card-bg);
+}
+
+.chart-select:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(255, 98, 0, 0.1);
+}
+
+/* Chart News Section */
+.chart-news-section {
+    display: flex;
+    flex-direction: column;
+    overflow: hidden; /* Verhindert Scrollen in der Section */
+    /* Höhe entspricht exakt der Chart-Section */
+    /* ANPASSBAR: Ändere --chart-card-total-height in :root (Zeile 28) für mehr/weniger Höhe */
+    height: var(--chart-card-total-height);
+}
+
+.chart__display__list-news {
+    overflow-y: auto;
+    margin-top: 16px;
+    /* Maximal 8 Aktivitäten vollständig sichtbar: Jeder Eintrag hat ca. 60px Höhe (padding + margin) */
+    /* Etwas mehr Platz, damit die 8. Aktivität nicht abgeschnitten wird */
+    max-height: calc(8 * 80px - 24px); /* 8 Einträge * 60px + 20px Padding für vollständige Sichtbarkeit */
+}
+
+.chart-news-empty {
+    text-align: center;
+    color: var(--text-light);
+    padding: 32px;
+    font-style: italic;
+}
+
+.chart__display__list-news__row-template {
+    padding: 12px;
+    margin-bottom: 8px;
+    border-radius: var(--radius);
+    border: 1px solid var(--border);
+    background: var(--card-bg);
+}
+
+.chart__display__list-news__row-template hr {
+    display: none;
+}
+
+.chart__display__list-news__row-template__display-time {
+    display: block;
+    font-size: 0.85rem;
+    color: var(--text-light);
+    margin-bottom: 4px;
+}
+
+.chart__display__list-news__row-template__display-text {
+    display: block;
+    color: var(--text);
 }
 
 .chart__display__list-news__row-template__foreign {
@@ -434,12 +914,15 @@ table th, table td {
 
 .chart__display__list-news__row-template__self {
     font-weight: bold;
+    border-left: 3px solid var(--primary);
 }
 
 .chart__display__list-news__row-template__sell {
-    background-color: #63ff63;
+    background-color: rgba(99, 255, 99, 0.15);
+    border-left: 3px solid #63ff63;
 }
 
 .chart__display__list-news__row-template__buy {
-    background-color: #ff4343;
+    background-color: rgba(255, 67, 67, 0.15);
+    border-left: 3px solid #ff4343;
 }

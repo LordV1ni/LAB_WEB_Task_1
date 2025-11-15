@@ -122,36 +122,26 @@ async function updateListOfRecipients()
         // Instance a new row template
         const clone = template.content.cloneNode(true);
 
-        clone.querySelector(".messages__div-recipient-list__clickable-element__select-deselect-user__template__display-username").textContent = user.name;
+        const labelElement = clone.querySelector(".messages__recipient-checkbox-label");
+        const checkbox = clone.querySelector(".messages__recipient-checkbox");
+        const textSpan = clone.querySelector(".messages__recipient-checkbox-text");
 
-        // Get the toplevel element of the clone, because querySelector doesn't work for that
-        const userElement = Array.from(clone.childNodes)
-            .find(node => node.nodeType === Node.ELEMENT_NODE &&
-                node.classList.contains("messages__div-recipient-list__clickable-element__select-deselect-user__template"));
+        textSpan.textContent = user.name;
 
-
+        // Set checkbox state based on whether user is in RECIPIENTS
         if (RECIPIENTS.includes(user))
         {
-            userElement.classList.add("messages__div-recipient-list__clickable-element__select-deselect-user__template__active")
+            checkbox.checked = true;
         }
         else
         {
-            userElement.classList.add("messages__div-recipient-list__clickable-element__select-deselect-user__template__inactive")
+            checkbox.checked = false;
         }
 
-        // Add an on-click listener
-        userElement.addEventListener("click", async event => {
+        // Add change event listener to checkbox
+        checkbox.addEventListener("change", async event => {
             const op = await selectOrDeselectUser(user);
-            if (op)
-            {
-                userElement.classList.remove("messages__div-recipient-list__clickable-element__select-deselect-user__template__inactive");
-                userElement.classList.add("messages__div-recipient-list__clickable-element__select-deselect-user__template__active");
-            }
-            else
-            {
-                userElement.classList.add("messages__div-recipient-list__clickable-element__select-deselect-user__template__inactive");
-                userElement.classList.remove("messages__div-recipient-list__clickable-element__select-deselect-user__template__active");
-            }
+            checkbox.checked = op;
         })
 
         frag.appendChild(clone);

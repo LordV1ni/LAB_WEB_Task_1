@@ -21,23 +21,23 @@ export let USERNAME = "";
 // Initialize the data of the top navigation bar
 export async function initNavigationBar()
 {
-    const display_name = document.getElementById("display_name");
-    const display_balance = document.getElementById("display_balance");
+    const display_name = document.querySelector("#display_name .user-name");
+    const display_balance = document.querySelector("#display_balance .balance-value");
 
     // Get the user data
     const user = await getUser();
     display_name.textContent = user.name;
-    display_balance.textContent = user.balance;
+    display_balance.textContent = parseFloat(user.balance).toFixed(2);
 }
 
 // Update the data of the top navigation bar
 export async function updateNavigationBar()
 {
-    const display_balance = document.getElementById("display_balance");
+    const display_balance = document.querySelector("#display_balance .balance-value");
 
     // Get the user data
     const user = await getUser();
-    display_balance.textContent = user.balance;
+    display_balance.textContent = parseFloat(user.balance).toFixed(2);
 }
 
 // Util
@@ -123,9 +123,67 @@ export class ServerPacket
 
 export const UserOwnedStockTypes =
 {
-    stocks: new Map()
+    stocks: new Map(),
+    
+    // Load purchase prices from localStorage
+    loadFromStorage() {
+        try {
+            const stored = localStorage.getItem('stockPurchasePrices');
+            if (stored) {
+                const prices = JSON.parse(stored);
+                Object.entries(prices).forEach(([name, data]) => {
+                    this.stocks.set(name, data.averagePrice);
+                });
+            }
+        } catch (e) {
+            console.warn('Failed to load purchase prices from localStorage:', e);
+        }
+    },
+    
+    // Save purchase prices to localStorage
+    saveToStorage() {
+        try {
+            const prices = {};
+            this.stocks.forEach((price, name) => {
+                prices[name] = { averagePrice: price };
+            });
+            localStorage.setItem('stockPurchasePrices', JSON.stringify(prices));
+        } catch (e) {
+            console.warn('Failed to save purchase prices to localStorage:', e);
+        }
+    },
+    
+    // Update purchase price with weighted average when buying more shares
+    updatePurchasePrice(stockName, newPrice, newAmount, existingAmount = 0) {
+        const existingPrice = this.stocks.get(stockName);
+        
+        if (existingPrice && existingAmount > 0) {
+            // Calculate weighted average: (oldPrice * oldAmount + newPrice * newAmount) / (oldAmount + newAmount)
+            const totalAmount = existingAmount + newAmount;
+            const weightedAverage = (existingPrice * existingAmount + newPrice * newAmount) / totalAmount;
+            this.stocks.set(stockName, weightedAverage);
+        } else {
+            // First purchase or no existing shares
+            this.stocks.set(stockName, newPrice);
+        }
+        
+        this.saveToStorage();
+    }
 }
 
+// Load purchase prices from localStorage on module load
+// This ensures prices are available on all pages
+if (typeof window !== 'undefined') {
+    // Use DOMContentLoaded to ensure DOM is ready
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', () => {
+            UserOwnedStockTypes.loadFromStorage();
+        });
+    } else {
+        // DOM already loaded, load immediately
+        UserOwnedStockTypes.loadFromStorage();
+    }
+}
 
 // Class representing a single stock
 export class Stock
@@ -253,8 +311,13 @@ export async function buyStock(stock, amount = 1)
         uiUpdateDynamic();
 
         const json = await response.json();
-        // Add the stock to the user owned stocks and update the price
-        UserOwnedStockTypes.stocks.set(stock, json.sales.stock.price);
+        // Get current owned amount to calculate weighted average
+        const currentStocks = await getUserStocks();
+        const currentStock = currentStocks.find(s => s.name === stock);
+        const existingAmount = currentStock ? currentStock.owning - amount : 0; // Subtract because we're adding
+        
+        // Update purchase price with weighted average
+        UserOwnedStockTypes.updatePurchasePrice(stock, json.sales.stock.price, amount, existingAmount);
     }catch (exception)
     {
         alert("Buying the stock failed: " + exception.message);
@@ -282,13 +345,25 @@ export async function sellStock(stock, amount = 1)
         // Check response
         if (!response.ok) {
             if (response.status === 422) {
-                alert(`Cant buy stock "${stock}": ${(await response.json()).error}`);
+                alert(`Cant sell stock "${stock}": ${(await response.json()).error}`);
                 return;
             }
             else {
-                alert(`Could not buy stock ${stock}: ${response.statusText}`);
+                alert(`Could not sell stock ${stock}: ${response.statusText}`);
                 return;
             }
+        }
+
+        // Update all dynamic ui immediately to make sure all changes are visible
+        uiUpdateDynamic();
+
+        // After selling, check if all shares are sold and remove purchase price if so
+        const currentStocks = await getUserStocks();
+        const currentStock = currentStocks.find(s => s.name === stock);
+        if (!currentStock || currentStock.owning <= 0) {
+            // All shares sold, remove purchase price
+            UserOwnedStockTypes.stocks.delete(stock);
+            UserOwnedStockTypes.saveToStorage();
         }
 
     }catch (exception)

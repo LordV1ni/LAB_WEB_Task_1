@@ -14,9 +14,10 @@
 
 <!-- Desktop Header mit Burger Menü -->
 <header id="topbar" aria-label="Hauptnavigation">
-    <div class="logo-area">Depot</div>
-    <p id="display_name">Lade...</p>
-    <p id="display_balance">Lade...</p>
+    <div id="user-info">
+        <span id="display_name"><span class="user-label">Benutzer:</span><span class="user-name">Lade...</span></span>
+        <span id="display_balance"><span class="balance-label">Kontostand:</span><span class="balance-value">Lade...</span></span>
+    </div>
     <button id="burger-menu" class="burger" aria-label="Navigation umschalten">&#9776;</button>
     <nav id="desktop-nav" class="hidden">
         <ul>
@@ -31,26 +32,26 @@
 
 <main id="layout">
     <!-- Portfolio Liste -->
-    <section class="card">
+    <section class="card portfolio-section">
         <h2>Mein Depot</h2>
-        <div id="div-environment-dynamic-portfolio-list">
+        <div id="div-environment-dynamic-portfolio-list" class="portfolio-list">
             <!-- dynamischer Inhalt später via JS/API -->
-            <p>Noch keine Aktien gekauft.</p>
+            <p class="portfolio-empty-message">Noch keine Aktien gekauft.</p>
         </div>
     </section>
 
     <!-- Kaufen / Verkaufen -->
-    <section class="card">
+    <section class="card portfolio-trade-section">
         <h2>Kaufen / Verkaufen</h2>
         <div class="form-group">
-            <label>Aktien-Symbol</label>
+            <label class="form-label" for="buy-stock-selection-drop-down">Aktien-Symbol</label>
             <select id="buy-stock-selection-drop-down" class="buy-stock-selection-drop-down">
                 <option value="none">Wird geladen...</option>
             </select>
         </div>
 
         <div class="form-group">
-            <label>Menge</label>
+            <label class="form-label" for="buy-stock-selection-amount">Menge</label>
             <input type="number" id="buy-stock-selection-amount" min="1" />
         </div>
 
@@ -90,14 +91,27 @@
 <!-- Templates -->
 
 <template id="div-environment-dynamic-portfolio-list__element-row-template">
-    <div class="div-environment-dynamic-portfolio-list:element-row-template">
-        <hr>
-        <button class="div-environment-dynamic-portfolio-list__element-row-template__action__quick-sell">Quick sell</button>
-        <span class="div-environment-dynamic-portfolio-list__element-row-template__name"></span>
-        <span class="div-environment-dynamic-portfolio-list__element-row-template__price"></span>
-        <span class="div-environment-dynamic-portfolio-list__element-row-template__owning"></span>
-        <span class="div-environment-dynamic-portfolio-list__element-row-template__profit"></span>
-        <hr>
+    <div class="portfolio-row">
+        <div class="portfolio-row__info">
+            <div class="portfolio-row__header">
+                <span class="portfolio-row__name"></span>
+                <button class="portfolio-row__quick-sell">Quick sell</button>
+            </div>
+            <div class="portfolio-row__details">
+                <div class="portfolio-row__detail">
+                    <span class="portfolio-row__label">Aktueller Preis:</span>
+                    <span class="portfolio-row__price"></span>
+                </div>
+                <div class="portfolio-row__detail">
+                    <span class="portfolio-row__label">Anzahl:</span>
+                    <span class="portfolio-row__owning"></span>
+                </div>
+                <div class="portfolio-row__detail">
+                    <span class="portfolio-row__label">Gewinn/Verlust:</span>
+                    <span class="portfolio-row__profit"></span>
+                </div>
+            </div>
+        </div>
     </div>
 </template>
 

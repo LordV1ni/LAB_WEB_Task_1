@@ -14,9 +14,10 @@
 
 <!-- Desktop Header mit Burger Menü -->
 <header id="topbar" aria-label="Hauptnavigation">
-    <div class="logo-area">Kursübersicht</div>
-    <p id="display_name">Lade...</p>
-    <p id="display_balance">Lade...</p>
+    <div id="user-info">
+        <span id="display_name"><span class="user-label">Benutzer:</span><span class="user-name">Lade...</span></span>
+        <span id="display_balance"><span class="balance-label">Kontostand:</span><span class="balance-value">Lade...</span></span>
+    </div>
     <button id="burger-menu" class="burger" aria-label="Navigation umschalten">&#9776;</button>
     <nav id="desktop-nav" class="hidden">
         <ul>
@@ -31,28 +32,34 @@
 
 <main id="layout">
     <!-- Chart Bereich -->
-    <section class="card">
+    <section class="card chart-section">
         <h2>Kursentwicklung</h2>
         <div class="form-group">
-            <label for="chart__select-symbol">Aktien-Symbol auswählen</label>
-            <select id="chart__select-symbol">
+            <label class="form-label" for="chart__select-symbol">Aktien-Symbol auswählen</label>
+            <select id="chart__select-symbol" class="chart-select">
                 <!-- Dynamisch aus API füllen -->
                 <option value="null">Wird geladen...</option>
             </select>
         </div>
-        <div id="chart-container">
-            <!-- Chart Library wird später mit JS eingefügt -->
-            <!-- Class is already handled in the stylesheet (for scaling)
-                 The scale has to be set in css otherwise the graph won't be drawn!!-->
-            <canvas id="chart__display__line-graph-canvas" class="chart__display__line-graph-canvas"></canvas>
+        <div class="chart-wrapper">
+            <div class="chart-container-wrapper">
+                <div id="chart-container" class="chart-container">
+                    <canvas id="chart__display__line-graph-canvas" class="chart__display__line-graph-canvas"></canvas>
+                </div>
+                <div class="chart-x-axis" id="chart-x-axis">
+                    <!-- X-Achsen-Skala wird dynamisch eingefügt -->
+                </div>
+            </div>
         </div>
     </section>
 
     <!-- News section -->
-    <section class="card">
+    <section class="card chart-news-section">
         <h2>Aktivitäten</h2>
         <!-- The important part is this div. Move this wherever you want -->
-        <div class="chart__display__list-news" id="chart__display__list-news"></div>
+        <div class="chart__display__list-news" id="chart__display__list-news">
+            <p class="chart-news-empty">Noch keine Aktivitäten.</p>
+        </div>
     </section>
 </main>
 

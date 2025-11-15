@@ -94,12 +94,28 @@ async function drawLineGraph()
     // Find the range for scaling
     const allX = data.flatMap(line => line.points.map(p => p.x));
     const allY = data.flatMap(line => line.points.map(p => p.y));
+    
+    // Handle empty data case
+    if (allX.length === 0 || allY.length === 0) {
+        updateChartScales(0, 0, 0, 0);
+        return;
+    }
+    
     const minX = Math.min(...allX), maxX = Math.max(...allX);
     const minY = Math.min(...allY), maxY = Math.max(...allY);
+    
+    // Update chart scales
+    updateChartScales(minX, maxX, minY, maxY);
 
     // Convert data points to canvas coordinates
+    // Verschiebe die X-Koordinaten, damit sie mit der verschobenen X-Achse übereinstimmen
+    const timeRange = maxX - minX;
+    const tickInterval = timeRange / 5; // 5 Ticks auf der X-Achse
+    const adjustedMinX = minX + tickInterval; // Starte beim zweiten Tick
+    
     function toCanvasX(x) {
-        return ((x - minX) / (maxX - minX)) * canvas.width;
+        // Normalisiere relativ zum verschobenen Startpunkt
+        return ((x - adjustedMinX) / (maxX - adjustedMinX)) * canvas.width;
     }
     function toCanvasY(y) {
         return canvas.height - ((y - minY) / (maxY - minY)) * canvas.height;
@@ -150,6 +166,40 @@ async function drawLineGraph()
     });
 
 }
+
+// Update chart scales (X-axis for time only, Y-axis removed)
+function updateChartScales(minX, maxX, minY, maxY) {
+    // Y-axis (price scale) wurde entfernt - nur X-axis wird aktualisiert
+    
+    // Update X-axis (time scale)
+    const xAxis = document.getElementById('chart-x-axis');
+    if (!xAxis) return;
+    
+    const numXTicks = 5; // Number of ticks on X-axis
+    xAxis.innerHTML = '';
+    
+    if (maxX > minX) {
+        // Verschiebe die Ticks so, dass der erste Tick dort ist, wo vorher der zweite war
+        // Wir erstellen numXTicks + 1 Ticks, aber zeigen nur die letzten numXTicks an
+        const timeRange = maxX - minX;
+        const tickInterval = timeRange / numXTicks;
+        
+        // Starte bei minX + tickInterval (also beim zweiten ursprünglichen Tick)
+        for (let i = 0; i <= numXTicks; i++) {
+            const tick = document.createElement('div');
+            tick.className = 'chart-x-axis__tick';
+            // Beginne bei minX + tickInterval statt minX
+            const timestamp = minX + tickInterval + (tickInterval * i);
+            const date = new Date(timestamp);
+            // Format: HH:MM:SS
+            const hours = date.getHours().toString().padStart(2, '0');
+            const minutes = date.getMinutes().toString().padStart(2, '0');
+            const seconds = date.getSeconds().toString().padStart(2, '0');
+            tick.textContent = `${hours}:${minutes}:${seconds}`;
+            xAxis.appendChild(tick);
+        }
+    }
+}
 // ########################
 
 // Update the displayed messages with the last 20? news
@@ -163,7 +213,7 @@ async function updateNewsDisplay()
 
     if(messages.length <= 0)
     {
-        env.innerHTML = "Noch keine Aktivitäten.";
+        env.innerHTML = "<p class='chart-news-empty'>Noch keine Aktivitäten.</p>";
         return;
     }
 

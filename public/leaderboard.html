@@ -14,9 +14,10 @@
 
 <!-- Desktop Header mit Burger Menü -->
 <header id="topbar" aria-label="Hauptnavigation">
-    <div class="logo-area">Rangliste</div>
-    <p id="display_name">Lade...</p>
-    <p id="display_balance">Lade...</p>
+    <div id="user-info">
+        <span id="display_name"><span class="user-label">Benutzer:</span><span class="user-name">Lade...</span></span>
+        <span id="display_balance"><span class="balance-label">Kontostand:</span><span class="balance-value">Lade...</span></span>
+    </div>
     <button id="burger-menu" class="burger" aria-label="Navigation umschalten">&#9776;</button>
     <nav id="desktop-nav" class="hidden">
         <ul>
@@ -30,7 +31,7 @@
 </header>
 
 <main id="layout">
-    <section class="card">
+    <section class="card leaderboard-card">
         <h2>Spieler Ranking</h2>
         <p>Sortiert nach aktuellem Vermögen.</p>
 

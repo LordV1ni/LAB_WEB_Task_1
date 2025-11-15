@@ -14,9 +14,10 @@
 
 <!-- Desktop Header mit Burger Menü -->
 <header id="topbar" aria-label="Hauptnavigation">
-    <div class="logo-area">Nachrichten</div>
-    <p id="display_name">Lade...</p>
-    <p id="display_balance">Lade...</p>
+    <div id="user-info">
+        <span id="display_name"><span class="user-label">Benutzer:</span><span class="user-name">Lade...</span></span>
+        <span id="display_balance"><span class="balance-label">Kontostand:</span><span class="balance-value">Lade...</span></span>
+    </div>
     <button id="burger-menu" class="burger" aria-label="Navigation umschalten">&#9776;</button>
     <nav id="desktop-nav" class="hidden">
         <ul>
@@ -31,20 +32,22 @@
 
 <main id="layout">
     <!-- Nachricht verfassen -->
-    <section class="card">
+    <section class="card messages-new-message">
         <h2>Neue Nachricht</h2>
 
         <div class="form-group">
-            <label>Empfänger auswählen</label>
-            <div class="form-control" id="messages__div-recipient-list"></div>
+            <label class="form-label">Empfänger auswählen</label>
+            <div class="messages__recipient-list" id="messages__div-recipient-list"></div>
         </div>
 
         <div class="form-group">
-            <label>Nachricht</label>
-            <textarea id="messages__input-message-text" placeholder="Nachricht eingeben..."></textarea>
+            <label class="form-label" for="messages__input-message-text">Nachricht</label>
+            <textarea id="messages__input-message-text" placeholder="Nachricht eingeben..." rows="5"></textarea>
         </div>
 
-        <button id="messages__button-send">Senden</button>
+        <div class="button-row">
+            <button id="messages__button-send">Senden</button>
+        </div>
         <div id="message-error" class="error-message"></div>
     </section>
 
@@ -102,16 +105,10 @@
 </template>
 
 <template id="messages__div-recipient-list__clickable-element__select-deselect-user__template">
-<span class="messages__div-recipient-list__clickable-element__select-deselect-user__template">
-        <!-- Users are selected/ deselected by clocking on their name.
-             Selected users get assigned the class:
-                ".messages__div-recipient-list__clickable-element__select-deselect-user__template__active" (This class is already present in the stylesheet)
-             Deselected users get assigned the class:
-                ".messages__div-recipient-list__clickable-element__select-deselect-user__template__inactive"
-             This class is added to the class-list of the element with the class "messages__div-recipient-list__clickable-element__select-deselect-user__template" (This class is not in the stylesheet)
-             By default, all elements are assigned the "[...]__inactive" class-->
-        <span class="messages__div-recipient-list__clickable-element__select-deselect-user__template__display-username"></span>
-</span>
+<label class="messages__recipient-checkbox-label">
+    <input type="checkbox" class="messages__recipient-checkbox" />
+    <span class="messages__recipient-checkbox-text"></span>
+</label>
 </template>
 
 </body>
