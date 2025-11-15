@@ -3,7 +3,7 @@
 import {
     initNavigationBar,
     updateNavigationBar,
-    DYNAMIC_UI_UPDATE_INTERVAL_IN_MS, getAllStocks, hash, GLOBAL_STOCK_TRENDS
+    DYNAMIC_UI_UPDATE_INTERVAL_IN_MS, getAllStocks, hash, GLOBAL_STOCK_TRENDS, getNews, USERNAME
 } from "./lib.js";
 
 let STOCKS_AVAILABLE_NAMES = [];
@@ -149,6 +149,67 @@ async function drawLineGraph()
 }
 // ########################
 
+// Update the displayed messages with the last 20? news
+async function updateNewsDisplay()
+{
+    // Get the last 20? available messages
+    const messages = await getNews(20);
+
+    // Get the environment
+    const env = document.getElementById("chart__display__list-news");
+
+    if(messages.length <= 0)
+    {
+        env.innerHTML = "Noch keine Aktivitäten.";
+        return;
+    }
+
+    // Update the list
+    // Grep the row template
+    const template = document.getElementById("chart__display__list-news__row-template");
+
+    // Create a fragment for the new list
+    const frag = document.createDocumentFragment();
+
+    messages.forEach((message) =>
+    {
+        // Instance a new row template
+        const clone = template.content.cloneNode(true);
+
+        clone.querySelector(".chart__display__list-news__row-template__display-time").textContent = message.time;
+        clone.querySelector(".chart__display__list-news__row-template__display-text").textContent = message.text;
+
+        // Get the toplevel element of the clone, because querySelector doesn't work for that
+        const userElement = Array.from(clone.childNodes)
+            .find(node => node.nodeType === Node.ELEMENT_NODE &&
+                node.classList.contains("chart__display__list-news__row-template"));
+
+        // Assign a class based on message origin
+        if (message.text.includes(USERNAME))
+        {
+            userElement.classList.add("chart__display__list-news__row-template__self");
+        }else
+        {
+            userElement.classList.add("chart__display__list-news__row-template__foreign");
+        }
+
+        // Assign a class based on message type
+        if (message.text.includes("VERKAUF"))
+        {
+            userElement.classList.add("chart__display__list-news__row-template__sell");
+        }else
+        {
+            userElement.classList.add("chart__display__list-news__row-template__buy");
+        }
+
+        frag.appendChild(clone);
+    })
+
+    // Clear the old list and append the new fragment
+    env.innerHTML = "";
+    env.appendChild(frag);
+}
+
 async function init ()
 {
     initNavigationBar();
@@ -161,6 +222,7 @@ async function contentLoop()
     updateNavigationBar();
     updateStockSelectionDropdownList();
     updateGraph();
+    updateNewsDisplay();
 }
 
 async function startContentLoop()

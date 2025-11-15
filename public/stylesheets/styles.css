@@ -427,3 +427,19 @@ table th, table td {
     height: 100%;
     outline: 1px solid black;
 }
+
+.chart__display__list-news__row-template__foreign {
+    font-weight: normal;
+}
+
+.chart__display__list-news__row-template__self {
+    font-weight: bold;
+}
+
+.chart__display__list-news__row-template__sell {
+    background-color: #63ff63;
+}
+
+.chart__display__list-news__row-template__buy {
+    background-color: #ff4343;
+}

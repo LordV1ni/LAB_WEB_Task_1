@@ -28,9 +28,9 @@
 </header>
 
 <main id="layout">
-    <!-- Auswahl Aktien Symbol -->
+    <!-- Chart Bereich -->
     <section class="card">
-        <h2>Aktienkurs anzeigen</h2>
+        <h2>Kursentwicklung</h2>
         <div class="form-group">
             <label for="chart__select-symbol">Aktien-Symbol auswählen</label>
             <select id="chart__select-symbol">
@@ -38,17 +38,19 @@
                 <option value="null">Wird geladen...</option>
             </select>
         </div>
-    </section>
-
-    <!-- Chart Bereich -->
-    <section class="card">
-        <h2>Kursentwicklung</h2>
         <div id="chart-container">
             <!-- Chart Library wird später mit JS eingefügt -->
             <!-- Class is already handled in the stylesheet (for scaling)
                  The scale has to be set in css otherwise the graph won't be drawn!!-->
             <canvas id="chart__display__line-graph-canvas" class="chart__display__line-graph-canvas"></canvas>
         </div>
+    </section>
+
+    <!-- News section -->
+    <section class="card">
+        <h2>Aktivitäten</h2>
+        <!-- The important part is this div. Move this wherever you want -->
+        <div class="chart__display__list-news" id="chart__display__list-news"></div>
     </section>
 </main>
 
@@ -75,6 +77,29 @@
         <span>Nachrichten</span>
     </a>
 </nav>
+
+<!-- Templates -->
+
+<template id="chart__display__list-news__row-template">
+    <div class="chart__display__list-news__row-template">
+        <!-- Messages regarding the user themselves are additionally assigned the class:
+                ".chart__display__list-news__row-template__self" (This class is already present in the stylesheet)
+             Messages regarding other users are additionally assigned the class:
+                ".chart__display__list-news__row-template__foreign" (This class is already present in the stylesheet)
+             This class is added to the class-list of the element with the class "chart__display__list-news__row-template"
+
+             Messages regarding a selling operation are additionally assigned the class:
+                ".chart__display__list-news__row-template__sell" (This class is already present in the stylesheet)
+             Messages regarding a buying operation are additionally assigned the class:
+                ".chart__display__list-news__row-template__buy" (This class is already present in the stylesheet)
+             This class is added to the class-list of the element with the class "chart__display__list-news__row-template"
+             -->
+        <hr>
+        <span class="chart__display__list-news__row-template__display-time"></span>
+        <span class="chart__display__list-news__row-template__display-text"></span>
+        <hr>
+    </div>
+</template>
 
 </body>
 </html>
