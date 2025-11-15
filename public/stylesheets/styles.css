@@ -421,3 +421,9 @@ table th, table td {
     background-color: var(--primary);
     text-align: left;
 }
+
+.chart__display__line-graph-canvas {
+    width: 100%;
+    height: 100%;
+    outline: 1px solid black;
+}

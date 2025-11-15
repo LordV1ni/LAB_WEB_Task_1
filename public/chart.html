@@ -32,10 +32,10 @@
     <section class="card">
         <h2>Aktienkurs anzeigen</h2>
         <div class="form-group">
-            <label for="chart-symbol">Aktien-Symbol auswählen</label>
-            <select id="chart-symbol">
+            <label for="chart__select-symbol">Aktien-Symbol auswählen</label>
+            <select id="chart__select-symbol">
                 <!-- Dynamisch aus API füllen -->
-                <option>Wird geladen...</option>
+                <option value="null">Wird geladen...</option>
             </select>
         </div>
     </section>
@@ -45,7 +45,9 @@
         <h2>Kursentwicklung</h2>
         <div id="chart-container">
             <!-- Chart Library wird später mit JS eingefügt -->
-            <canvas id="stock-chart"></canvas>
+            <!-- Class is already handled in the stylesheet (for scaling)
+                 The scale has to be set in css otherwise the graph won't be drawn!!-->
+            <canvas id="chart__display__line-graph-canvas" class="chart__display__line-graph-canvas"></canvas>
         </div>
     </section>
 </main>
