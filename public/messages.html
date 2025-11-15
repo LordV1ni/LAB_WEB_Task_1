@@ -34,13 +34,7 @@
 
         <div class="form-group">
             <label>Empfänger auswählen</label>
-            <select id="message-recipients" multiple>
-                <!-- dynamischer Inhalt via JS -->
-                <option>max</option>
-                <option>moritz</option>
-                <option>lempel</option>
-                <option>bolte</option>
-            </select>
+            <div class="form-control" id="messages__div-recipient-list"></div>
         </div>
 
         <div class="form-group">
@@ -55,9 +49,10 @@
     <!-- Nachrichtenliste -->
     <section class="card">
         <h2>Eingehende Nachrichten</h2>
-        <div id="message-list" class="message-list">
+        <div id="messages__div-area-list__container" class="message-list">
             <!-- Nachrichten kommen dynamisch hier rein -->
-            <p>Noch keine Nachrichten vorhanden.</p>
+            <!-- Maybe make this area scrollable? -->
+            <p>Nachrichten werden geladen...</p>
         </div>
     </section>
 </main>
@@ -85,6 +80,37 @@
         <span>Nachrichten</span>
     </a>
 </nav>
+
+<!-- Templates -->
+
+<template id="messages__div-area-list__container__row-template">
+<div class="messages__div-area-list__container__row-template">
+        <!-- Maybe format what's inside here more like a message (WhatsApp etc.)? -->
+        <!-- Messages send by the user themselves are additionally assigned the class:
+                ".messages__div-area-list__container__row-template__style-send-self"
+             Messages send by other users are additionally assigned the class:
+                ".messages__div-area-list__container__row-template__style-send-foreign"
+             This class is added to the class-list of the element with the class "messages__div-area-list__container__row-template"-->
+        <hr>
+        <span class="messages__div-area-list__container__row-template__display-date"></span>
+        <span class="messages__div-area-list__container__row-template__display-sender"></span>
+        <span class="messages__div-area-list__container__row-template__display-text"></span>
+        <hr>
+</div>
+</template>
+
+<template id="messages__div-recipient-list__clickable-element__select-deselect-user__template">
+<span class="messages__div-recipient-list__clickable-element__select-deselect-user__template">
+        <!-- Users are selected/ deselected by clocking on their name.
+             Selected users get assigned the class:
+                ".messages__div-recipient-list__clickable-element__select-deselect-user__template__active" (This class is already present in the stylesheet)
+             Deselected users get assigned the class:
+                ".messages__div-recipient-list__clickable-element__select-deselect-user__template__inactive"
+             This class is added to the class-list of the element with the class "messages__div-recipient-list__clickable-element__select-deselect-user__template" (This class is not in the stylesheet)
+             By default, all elements are assigned the "[...]__inactive" class-->
+        <span class="messages__div-recipient-list__clickable-element__select-deselect-user__template__display-username"></span>
+</span>
+</template>
 
 </body>
 </html>

@@ -407,3 +407,7 @@ table th, table td {
         display: none;
     }
 }
+
+.messages__div-recipient-list__clickable-element__select-deselect-user__template__active {
+    background-color: var(--primary);
+}

@@ -455,6 +455,7 @@ export async function getMessages(n)
         json = json.slice(-n)
         json.forEach(message => messages.push(new Message(message.date, message.sender, message.recipient, message.text)));
         Log.log(`Available message list is ${messages}`);                  // @Jenkins line-remove-on-publish
+        messages.sort((a, b) => a.date - a.date);
         return messages;
     }
     Log.log(`Messages fetch failed`);                  // @Jenkins line-remove-on-publish
