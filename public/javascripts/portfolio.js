@@ -1,7 +1,7 @@
 "use strict";
 
 import {
-    buyStock, DYNAMIC_UI_UPDATE_INTERVAL_IN_MS, getAllStocks, getUserStocks, initNavigationBar,
+    buyStock, DYNAMIC_UI_UPDATE_INTERVAL_IN_MS, getAllStocks, getUserStocks, hash, initNavigationBar,
     sellStock, updateNavigationBar, UserOwnedStockTypes
 } from "./lib.js";
 
@@ -25,9 +25,11 @@ async function updateUserOwnedStocks()
     }
 
     // Update the list
-    env.innerHTML = "";
     // Grep the row template
     const template = document.getElementById("div-environment-dynamic-portfolio-list__element-row-template");
+
+    // Create a fragment for the new list
+    const frag = document.createDocumentFragment();
 
     stocks.forEach((stock) =>
     {
@@ -43,8 +45,12 @@ async function updateUserOwnedStocks()
             placeOwnValuesInSellField(stock);
         });
 
-        env.appendChild(clone);
+        frag.appendChild(clone);
     })
+
+    // Clear the old list and append the new fragment
+    env.innerHTML = "";
+    env.appendChild(frag);
 }
 
 let STOCKS_AVAILABLE_NAMES = [];
@@ -55,9 +61,24 @@ async function queryAvailableStocks()
     STOCKS_AVAILABLE_NAMES = await getAllStocks();
 }
 
+// Calculate a hash over the available stock names
+async function hashAvailableStocks()
+{
+    const temp = [];
+    STOCKS_AVAILABLE_NAMES.forEach(stock => {
+        temp.push(stock.name);
+    })
+    return await hash(temp);
+}
+
 async function updateStockSelectionDropdownList()
 {
+
+    const old_hash = await hashAvailableStocks();
     await queryAvailableStocks();
+    // Only update the dropdown if the list of available stocks has changed
+    const new_hash = await hashAvailableStocks();
+    if (old_hash === new_hash) return;
     const menu = document.getElementById("buy-stock-selection-drop-down");
     // Save the current selected value
     const selected= menu.value;

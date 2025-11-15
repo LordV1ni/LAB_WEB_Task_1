@@ -42,6 +42,16 @@ export async function updateNavigationBar()
 
 // Util
 
+// Calculate a simple hash over a string
+export async function hash(str) {
+    let hash = 0;
+    for (const char of str) {
+        hash = (hash << 5) - hash + char.charCodeAt(0);
+        hash |= 0; // Constrain to 32bit integer
+    }
+    return hash;
+}
+
 // @Jenkins start-block-remove-on-publish
 // Log something to the console
 export const Log = Object.freeze({

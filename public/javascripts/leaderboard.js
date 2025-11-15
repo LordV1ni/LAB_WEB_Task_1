@@ -20,8 +20,10 @@ async function updatePlayerRanking()
     // Grep the template
     const template = document.getElementById("tr-environment-dynamic-ranking-list__element-row-template");
 
-    env.innerHTML = ``;
     // Create one new element per user
+
+    // Create a new fragment for the new list
+    const frag = document.createDocumentFragment();
     let i = 1;
     users.forEach(user => {
         // Instance a new row template
@@ -31,9 +33,13 @@ async function updatePlayerRanking()
         clone.querySelector(".tr-environment-dynamic-ranking-list__element-row-template__username").textContent = user.name;
         clone.querySelector(".tr-environment-dynamic-ranking-list__element-row-template__value").textContent = user.balance.toFixed(2) + " €";
 
-        env.appendChild(clone);
+        frag.appendChild(clone);
         i++;
     })
+
+    // Clear the old list and add the new on
+    env.innerHTML = ``;
+    env.appendChild(frag);
 }
 
 async function init ()
