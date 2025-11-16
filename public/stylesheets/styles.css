@@ -730,14 +730,112 @@ table th, table td {
     box-shadow: 0 0 0 3px rgba(255, 98, 0, 0.1);
 }
 
-.messages__div-area-list__container__row-template__style-send-self {
-    background-color: #63ff63;
-    text-align: right;
+/* Nachrichtenliste Container */
+.message-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-top: 16px;
+    max-height: 600px;
+    overflow-y: auto;
+    padding-right: 4px;
 }
 
-.messages__div-area-list__container__row-template__style-send-foreign {
-    background-color: var(--primary);
-    text-align: left;
+/* Scrollbar Styling für Nachrichtenliste */
+.message-list::-webkit-scrollbar {
+    width: 8px;
+}
+
+.message-list::-webkit-scrollbar-track {
+    background: var(--bg);
+    border-radius: 4px;
+}
+
+.message-list::-webkit-scrollbar-thumb {
+    background: var(--border);
+    border-radius: 4px;
+}
+
+.message-list::-webkit-scrollbar-thumb:hover {
+    background: var(--text-light);
+}
+
+/* Nachrichten-Container */
+.messages__div-area-list__container__row-template {
+    display: flex;
+    width: 100%;
+    margin-bottom: 12px;
+}
+
+/* Nachrichten-Bubble */
+.message-bubble {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 12px 16px;
+    box-shadow: 0 1px 3px var(--shadow);
+    width: 100%;
+    transition: all 0.2s;
+}
+
+.message-bubble:hover {
+    box-shadow: 0 2px 6px var(--shadow);
+}
+
+/* Message Header (Sender und Datum) */
+.message-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+    gap: 12px;
+}
+
+.messages__div-area-list__container__row-template__display-sender {
+    font-weight: 600;
+    color: var(--text);
+    font-size: 0.95rem;
+}
+
+.messages__div-area-list__container__row-template__display-date {
+    font-size: 0.85rem;
+    color: var(--text-light);
+    white-space: nowrap;
+}
+
+/* Message Content */
+.message-content {
+    color: var(--text);
+    line-height: 1.5;
+    word-wrap: break-word;
+}
+
+.messages__div-area-list__container__row-template__display-text {
+    display: block;
+    white-space: pre-wrap;
+}
+
+/* Eingehende Nachrichten (empfangen, grünlich) */
+.messages__div-area-list__container__row-template__style-send-foreign .message-bubble {
+    background: linear-gradient(135deg, rgba(99, 255, 99, 0.15) 0%, var(--card-bg) 100%);
+    border-left: 4px solid #63ff63;
+}
+
+.messages__div-area-list__container__row-template__style-send-foreign .messages__div-area-list__container__row-template__display-sender {
+    color: #006600;
+    font-weight: 600;
+}
+
+/* Ausgehende Nachrichten (gesendet, rötlich-orange) */
+.messages__div-area-list__container__row-template__style-send-self .message-bubble {
+    background: linear-gradient(135deg, rgba(255, 140, 0, 0.15) 0%, var(--card-bg) 100%);
+    border-left: 4px solid #ff8c00;
+    box-shadow: 0 2px 4px rgba(255, 140, 0, 0.2);
+}
+
+.messages__div-area-list__container__row-template__style-send-self .messages__div-area-list__container__row-template__display-sender {
+    color: #cc5500;
+    font-weight: 700;
 }
 
 /* ------------------------------------------------------------

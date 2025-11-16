@@ -9,57 +9,94 @@ import {
     USERNAME
 } from "./lib.js";
 
+// Flag to prevent concurrent updates
+let isUpdatingMessages = false;
+
 // Update the displayed messages
 async function updateMessageDisplay()
 {
-    // Get the last 20? available messages
-    const messages = await getMessages(20);
-
-    // Get the environment
-    const env = document.getElementById("messages__div-area-list__container");
-
-    if(messages.length <= 0)
-    {
-        env.innerHTML = "Noch keine Nachrichten vorhanden.";
+    // Prevent concurrent updates
+    if (isUpdatingMessages) {
         return;
     }
+    isUpdatingMessages = true;
+    
+    try {
+        // Get the last 20? available messages
+        const messages = await getMessages(20);
 
-    // Update the list
-    // Grep the row template
-    const template = document.getElementById("messages__div-area-list__container__row-template");
+        // Get the environment
+        const env = document.getElementById("messages__div-area-list__container");
 
-    // Create a fragment for the new list
-    const frag = document.createDocumentFragment();
-
-    messages.forEach((message) =>
-    {
-        // Instance a new row template
-        const clone = template.content.cloneNode(true);
-
-        clone.querySelector(".messages__div-area-list__container__row-template__display-date").textContent = new Date(message.date).toLocaleTimeString();
-        clone.querySelector(".messages__div-area-list__container__row-template__display-sender").textContent = message.sender;
-        clone.querySelector(".messages__div-area-list__container__row-template__display-text").textContent = message.text;
-
-        // Get the toplevel element of the clone, because querySelector doesn't work for that
-        const userElement = Array.from(clone.childNodes)
-            .find(node => node.nodeType === Node.ELEMENT_NODE &&
-                node.classList.contains("messages__div-area-list__container__row-template"));
-
-        // Assign a class based on message origin
-        if (message.sender === USERNAME)
+        if(messages.length <= 0)
         {
-            userElement.classList.add("messages__div-area-list__container__row-template__style-send-self");
-        }else
-        {
-            userElement.classList.add("messages__div-area-list__container__row-template__style-send-foreign");
+            env.innerHTML = "Noch keine Nachrichten vorhanden.";
+            return;
         }
 
-        frag.appendChild(clone);
-    })
+        // Update the list
+        // Grep the row template
+        const template = document.getElementById("messages__div-area-list__container__row-template");
 
-    // Clear the old list and append the new fragment
-    env.innerHTML = "";
-    env.appendChild(frag);
+        // Create a fragment for the new list
+        const frag = document.createDocumentFragment();
+
+        messages.forEach((message) =>
+        {
+            // Instance a new row template
+            const clone = template.content.cloneNode(true);
+
+            // Format date nicely
+            const messageDate = new Date(parseInt(message.date));
+            const now = new Date();
+            const isToday = messageDate.toDateString() === now.toDateString();
+            let dateString;
+            if (isToday) {
+                dateString = messageDate.toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' });
+            } else {
+                const dateOptions = { 
+                    day: '2-digit', 
+                    month: '2-digit', 
+                    hour: '2-digit', 
+                    minute: '2-digit' 
+                };
+                if (messageDate.getFullYear() !== now.getFullYear()) {
+                    dateOptions.year = 'numeric';
+                }
+                dateString = messageDate.toLocaleString('de-DE', dateOptions);
+            }
+            
+            clone.querySelector(".messages__div-area-list__container__row-template__display-date").textContent = dateString;
+            
+            // Format sender -> recipient(s)
+            const recipientText = message.recipient || "Alle";
+            const senderRecipientText = `${message.sender} → ${recipientText}`;
+            clone.querySelector(".messages__div-area-list__container__row-template__display-sender").textContent = senderRecipientText;
+            clone.querySelector(".messages__div-area-list__container__row-template__display-text").textContent = message.text;
+
+            // Get the toplevel element of the clone, because querySelector doesn't work for that
+            const userElement = Array.from(clone.childNodes)
+                .find(node => node.nodeType === Node.ELEMENT_NODE &&
+                    node.classList.contains("messages__div-area-list__container__row-template"));
+
+            // Assign a class based on message origin
+            if (message.sender === USERNAME)
+            {
+                userElement.classList.add("messages__div-area-list__container__row-template__style-send-self");
+            }else
+            {
+                userElement.classList.add("messages__div-area-list__container__row-template__style-send-foreign");
+            }
+
+            frag.appendChild(clone);
+        })
+
+        // Clear the old list and append the new fragment
+        env.innerHTML = "";
+        env.appendChild(frag);
+    } finally {
+        isUpdatingMessages = false;
+    }
 }
 
 let USERS = [];
@@ -182,24 +219,31 @@ async function send()
     document.getElementById("messages__input-message-text").value = "";
 }
 
+let contentLoopInterval = null;
+
 async function init ()
 {
     initNavigationBar();
     initClickable();
+    // Initial load
+    await contentLoop();
     startContentLoop();
-
 }
 
 async function contentLoop()
 {
     updateNavigationBar();
-    updateMessageDisplay();
+    await updateMessageDisplay();
     updateListOfRecipients();
 }
 
 async function startContentLoop()
 {
-    setInterval(contentLoop, DYNAMIC_UI_UPDATE_INTERVAL_IN_MS);
+    // Prevent multiple intervals
+    if (contentLoopInterval !== null) {
+        clearInterval(contentLoopInterval);
+    }
+    contentLoopInterval = setInterval(contentLoop, DYNAMIC_UI_UPDATE_INTERVAL_IN_MS);
 }
 
 async function initClickable()
