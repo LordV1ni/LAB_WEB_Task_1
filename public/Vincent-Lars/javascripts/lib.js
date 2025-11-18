@@ -426,7 +426,8 @@ export async function getUser()
         USERNAME = json.name;
         return new User(json.name, json.balance);
     }
-    throw new ServerException("Unable to get user", packet.message);
+    //throw new ServerException("Unable to get user", packet.message);
+    alert("Unable to get user: " + packet.message);
 }
 
 // Get all users as a list of user objects
