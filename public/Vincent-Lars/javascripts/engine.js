@@ -6,7 +6,7 @@
 import {DYNAMIC_UI_UPDATE_INTERVAL_IN_MS, getAllStocks} from "./lib.js";
 
 let GLOBAL_STOCK_DATA_PROCESS_RUNNING = false;
-const MAX_STOCK_TREND_HISTORY_LENGTH = 200;
+const MAX_STOCK_TREND_HISTORY_LENGTH = 1000;
 
 // Capture the global stock trends over the entire running time of the client
 export const GLOBAL_STOCK_TRENDS = new Map();
