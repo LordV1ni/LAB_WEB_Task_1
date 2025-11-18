@@ -4,7 +4,8 @@ import {
     initNavigationBar,
     updateNavigationBar,
     getUser,
-    DYNAMIC_UI_UPDATE_INTERVAL_IN_MS
+    DYNAMIC_UI_UPDATE_INTERVAL_IN_MS,
+    alertCustom
 } from "./lib.js";
 
 async function setGreetingMessage(user)

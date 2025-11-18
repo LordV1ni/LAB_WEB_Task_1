@@ -1,6 +1,7 @@
 "use strict";
 
 import {
+    alertCustom,
     buyStock, DYNAMIC_UI_UPDATE_INTERVAL_IN_MS, getAllStocks, getUserStocks, hash, initNavigationBar,
     sellStock, updateNavigationBar, UserOwnedStockTypes
 } from "./lib.js";
@@ -135,7 +136,7 @@ async function buy()
     const amount = document.getElementById("buy-stock-selection-amount").value;
 
     if (name === "none") {
-        alert("Bitte eine Aktie auswählen");
+        alertCustom("Bitte eine Aktie auswählen");
         return;
     }
 
@@ -152,7 +153,7 @@ async function sell()
     const amount = document.getElementById("buy-stock-selection-amount").value;
 
     if (name === "none") {
-        alert("Bitte eine Aktie auswählen");
+        alertCustom("Bitte eine Aktie auswählen");
         return;
     }
 

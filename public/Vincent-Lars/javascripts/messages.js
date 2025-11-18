@@ -1,6 +1,7 @@
 "use strict";
 
 import {
+    alertCustom,
     DYNAMIC_UI_UPDATE_INTERVAL_IN_MS,
     getAllUsers,
     getMessages, hash,
@@ -195,13 +196,13 @@ async function send()
     const text = document.getElementById("messages__input-message-text").value;
     if (text === "")
     {
-        alert("Bitte geben sie eine Nachricht ein.");
+        alertCustom("Bitte geben sie eine Nachricht ein.");
         return;
     }
 
     if (RECIPIENTS.length <= 0)
     {
-        alert("Bitte wählen sie mindestens einen Empfänger aus.");
+        alertCustom("Bitte wählen sie mindestens einen Empfänger aus.");
         return;
     }
 
